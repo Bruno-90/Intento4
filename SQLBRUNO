@@ -1,0 +1,503 @@
+use master
+go
+
+--nombre de la tabla
+create database DataBase_Laboratorio
+go
+
+use DataBase_Laboratorio
+go
+
+create table Paises
+(
+ID int not null,
+Descripcion varchar (50) not null,
+Constraint PK_Paises PRImary key(ID)
+
+
+)
+go
+
+create table Provincias
+(
+ID int not null,
+IDPais int not null,
+Descripcion varchar (100) not null,
+constraint PK_provincias primary key(ID),
+constraint FK_Provincia_Pais foreign key(IDPais)
+references Paises(ID),
+)
+go
+
+
+create table Ciudades
+(
+ID int not null,
+IDProvincia INT not null,
+Descripcion varchar (100) not null,
+Constraint PK_Ciudades PRImary key(ID),
+constraint FK_Ciudades_Provincias foreign key(iDProvincia)
+references Provincias(ID),
+
+)
+go
+
+
+create table Direcciones
+(
+ID INT not null,
+IDCiudad INT not null,
+Calle varchar (100) not null,
+Numero varchar(10) not null,
+Constraint PK_Direcciones PRImary key(ID),
+constraint FK_Direcciones_Ciudades foreign key(iDCiudad)
+references Ciudades(ID),
+
+)
+go
+
+
+create table Categorias
+(
+ID INT not null,
+Descripcion varchar (100) not null,
+Constraint PK_Catregorias Primary key(ID)
+
+
+)
+go
+
+create table Departamentos
+(
+ID int not null,
+Descripcion varchar (100) not null,
+Constraint PK_Departamentos Primary key(ID)
+
+
+)
+go
+
+
+create table Permisos
+(
+Id int not null,
+Descripcion varchar (100) not null,
+Constraint PK_Permisos Primary key(Id)
+
+
+)
+go
+
+create table Etapas
+(
+Id int not null,
+Descripcion varchar (50) not null,
+Constraint PK_Etapas Primary key(Id)
+
+
+)
+go
+
+
+create table Insumos
+(
+Id int not null,
+IdEtapa int not null,
+Codigo varchar (20) not null,
+Descripcion varchar(100) not null,
+Constraint PK_Insumos PRImary key(Id),
+constraint FK_Etapas foreign key(IdEtapa)
+references Etapas(Id),
+
+)
+go
+
+ 
+ create table Empresas
+(
+ID int not null,
+IDDireccion int not null,
+IDCategoria int not null,
+RazonSocial int not null,
+Telefono varchar (20) not null,
+Constraint PK_Empresas Primary key(ID),
+constraint FK_Direcciones foreign key(IDDireccion)
+references Direcciones(ID),
+constraint FK_Categorias foreign key(IDCategoria)
+references Categorias(ID),
+
+)
+go
+
+ create table Contactos
+(
+ID INT not null,
+IDEmpresa INT not null,
+Nombre varchar (50) not null,
+Apellido varchar (50) not null,
+Telefono varchar (20) null,
+Mail varchar (50) not null,
+Descripcion varchar (100)  null,
+Constraint PK_Contactos Primary key(ID),
+constraint FK_Empresas foreign key(IDEmpresa)
+references Empresas(ID),
+)
+go
+
+ create table Usuarios
+(
+ID INT not null,
+IDContacto INT not null,
+IDDepartamento INT not null,
+IDPermiso INT not null,
+Constraint PK_Usuarios Primary key(ID),
+constraint FK_Contactos foreign key(IDContacto)
+references Contactos(ID),
+constraint FK_Departamentos foreign key(IDDepartamento)
+references Departamentos(ID),
+constraint FK_Permisos foreign key(IDPermiso)
+references Permisos(ID),
+)
+go
+
+
+
+ create table ProductosPreCargados
+(
+ID int not null,
+IDEmpresa int foreign key  references Empresas(ID) not null,
+Descripcion varchar (100) not null,
+Codigo varchar (20) not null,
+Constraint PK_ProductosPreCargados Primary key(ID),
+
+
+)
+go
+
+
+create table InsumosxProductosPreCargados
+(
+ID int not null,
+IDInsumo int not null,
+CantidadTeorica varchar (20) not null,
+Constraint PK_InsumosxProductosPreCargados Primary key(ID),
+constraint FK_Insumos foreign key(IDInsumo)
+references Etapas(ID),
+
+)
+go
+ 
+ 
+create table Ingresos
+(
+ID int not null,
+IDUsuario int not null,
+IDEmpresa int not null,
+Remito varchar (30) not null,
+Fecha datetime not null ,
+---IDEstado int not null,
+Constraint PK_Ingresos Primary key(ID),
+constraint FK_Usuarios foreign key(IDUsuario)
+references Usuarios(ID),
+constraint FK_EmpresasIngresos foreign key(IDEmpresa)
+references Empresas(ID),
+
+)
+go
+ 
+
+ 
+create table Consumibles
+(
+ID INT not null,
+IDIngreso INT not null,
+Descripcion varchar(100)not null,
+Cantidad varchar (20) not null,
+Constraint PK_Consumibles Primary key(Id),
+constraint FK_Ingresos foreign key(IdIngreso)
+references Ingresos (ID),
+
+)
+go
+
+
+create table Estados
+(
+Id int not null,
+Descripcion varchar (30)not null,
+Constraint PK_Estados Primary key(Id),
+
+
+)
+go
+ 
+ 
+create table MateriasPrimas
+(
+Id int not null,
+IdIngreso int not null,
+IdInsumo int not null,
+IdEstado int not null,
+Lote varchar (20)  null,
+Analisis varchar(20)  null ,
+Vencimiento datetime ,
+Cantidad varchar(20) not null,
+Constraint PK_MateriasPrimas Primary key(ID),
+constraint FK_IngresoMateriasPrimas foreign key(IDIngreso)
+references Insumos(ID),
+constraint FK_Estados foreign key(IDEstado)
+references Estados(ID),
+
+)
+go
+
+
+create table Productos
+(
+ID INT not null,
+IDProductoPrecargado INT not null,
+IDIngreso INT not null,
+Lote varchar (20) not null,
+Analisis varchar(20) not null ,
+Estado varchar (20)not null,
+Vencimiento datetime ,
+Codigo varchar(30) not null,
+Constraint PK_Productos Primary key(Id),
+constraint FK_ProductosPreCargados foreign key(IDProductoPrecargado)
+references ProductosPreCargados(Id),
+constraint FK_IngresosProductos foreign key(IDIngreso)
+references Ingresos(Id),
+
+)
+go
+ 
+
+ create table ProductosDet
+(
+IDProducto INT not null,
+IDInsumo INT not null,
+Detalle varchar (30) not null,
+Vencimiento datetime not null ,
+Cantidad varchar (20)not null,
+Constraint PK_ProductosDet Primary key(IDProducto,IDInsumo),
+constraint FK_Productos foreign key(IDProducto)
+references Productos(Id),
+constraint FK_InsumosProdDet foreign key(IDInsumo)
+references Insumos(Id),
+
+
+)
+go
+ 
+
+ Create table Racks
+(
+ID INT  not null,
+Descripcion varchar (30)not null,
+Constraint PK_Racks Primary key(Id),
+
+
+)
+go
+ 
+
+  create table Casilleros
+(
+ID INT not null,
+IDRack INT not null,
+Descripcion varchar (30) not null,
+Estado varchar (20) not null,
+Constraint PK_Casilleros Primary key(Id),
+constraint FK_Racks foreign key(IDRack)
+references Racks(Id),
+
+
+)
+go
+
+ create table CasillerosXingresos
+(
+IDIngreso int not null,
+IDCasillero int not null,
+Fecha datetime not null ,
+Baja bit not null,
+Constraint PK_CasillerosXingresos Primary key(IDIngreso,IdCasillero),
+constraint FK_IngresosXcasilleros foreign key(IDIngreso)
+references Ingresos(Id),
+constraint FK_Casilleros foreign key(IdCasillero)
+references Casilleros(Id),
+
+)
+go
+
+
+
+
+--------> ESTA MAL
+
+
+ create table ProductosXEtapas
+(
+IdProducto INT Not null,
+IdEtapa INT not null,
+IdEstado INT not null,
+Constraint PK_ProductosXEtapas Primary key(IDProducto),
+constraint FK_ProductosXEtapas foreign key(IDProducto)
+references Productos(Id),
+constraint FK_EtapasXProductos foreign key(IDEtapa)
+references Etapas(Id),
+constraint FK_Estado foreign key(IDEstado)
+references Estados(ID),
+
+)
+go
+
+
+
+---ESTA LA HICE YO REVISAR CLAVE PRIMARIA create table ProductoXetapa
+ (
+IdProducto varchar (20)not null,
+IdEtapa varchar(20) not null,
+IdEstado varchar (20)not null,
+Constraint PK_ProductoXetapa Primary key(IdProducto,IdEtapa,IdEstado),
+constraint FK_ProductoXetapa foreign key(IdProducto)
+references Producto(Id),
+constraint FK_EtapaXProducto foreign key(IdEtapa)
+references Etapa(Id),
+constraint FK_Estado foreign key(IdEstado)
+references Estado(Id),
+
+)
+go----
+
+
+---------------------------------------------------TIENE FOREIGN KEY EN PRODUCTOS
+
+insert into Paises(ID,Descripcion)
+select 1,'Argentina' go
+select * from paises
+delete from Paises
+where ID=11
+
+insert into Paises(ID,Descripcion)
+select 2,'Uruguay' go
+
+insert into Paises(ID,Descripcion)
+select 3,'Paraguay' go
+
+insert into Paises(ID,Descripcion)
+select 4,'Brasil' go
+
+insert into Paises(ID,Descripcion)
+select 5,'Chile' go
+
+insert into Provincias(ID,IDPais,Descripcion)
+select 1,1,'Buenos Aires' go
+
+insert into Provincias(ID,IDPais,Descripcion)
+select 2,1,'Cordoba' go
+
+insert into Provincias(ID,IDPais,Descripcion)
+select 3,1,'Mendoza' go
+
+insert into Provincias(ID,IDPais,Descripcion)
+select 4,1,'Neuquen' go
+
+insert into Ciudades(ID,IDProvincia,Descripcion)
+select 5,1,'Tigre' go
+}
+select * from Direcciones
+
+insert into Direcciones(ID,IDCiudad,Calle,Numero)
+select 0,5,'Austria norte ','1277' go
+
+insert into Direcciones(ID,IDCiudad,Calle,Numero)
+select 1,3,'Colectora Autopista Panamericana Ramal Pilar Sur','KM 36,5' go
+
+insert into Categorias(ID,Descripcion)
+select 1,'Laboratorio' go
+
+
+--LA RAZON SOCIAL ESTA MAL LA VARIABLE ES VARCHAR
+
+insert into Empresas(ID,IDDireccion,IDCategoria,RazonSocial,Telefono)
+
+select 1,1,1,'Laboratorio Bernabo','4501-3213';
+
+
+insert into Empresas(ID,IDDireccion,IDCategoria,RazonSocial,Telefono)
+
+select 0,0,1,'Laboratorio Bria Pharma','5245-6786';
+go
+
+--YA LO MODIFIQUE
+
+ALTER TABLE empresas alter column RazonSocial varchar(50)
+
+
+insert into ProductosPreCargados(ID,IDEmpresa,Descripcion,Codigo)
+select 1,1,'Kala','0827C' go
+
+select * from Productos
+
+select * from Departamentos
+
+insert into Departamentos(ID,Descripcion)
+select 1,'Deposito' go
+
+insert into Permisos(ID,Descripcion)
+select 1,'Operario de Deposito' go
+
+select * from Contactos
+
+insert into Contactos(ID,IDEmpresa,Nombre,Apellido,Telefono,Mail,Descripcion)
+select 1,0,'Ezequiel','Seijo','int 107','deposito@briapharma.com','Operario de Deposito' go
+
+insert into Usuarios(ID,IDContacto,IDDepartamento,IDPermiso)
+select 1,1,1,1 go
+
+Select * from Ingresos
+
+insert into Ingresos(ID,IDUsuario,IDEmpresa,Remito,Fecha)
+select 1,1,1,'00045','2021/08/15' go
+
+select * from Productos
+
+-- EN PRODUCTOS FALTARIA EL NUMERO DE OP
+
+ALTER TABLE Productos ADD NumeroDeOp varchar(20);
+-- ESTADO SERIA CUARENTENA APROBADO? O EN
+insert into Productos(ID,IDProductoPrecargado,IDIngreso,Lote,Analisis,Estado,Vencimiento,Codigo)
+select 1,1,1,'008608','N/A','Materia prima','2023-06-01','0827C' go
+
+select * from ProductosXEtapas
+select * from Etapas
+
+insert into Etapas(ID,Descripcion)
+select 1,'Fraccionamiento'go 
+
+insert into Etapas(ID,Descripcion)
+select 2,'Granulacion'go 
+insert into Etapas(ID,Descripcion)
+select 3,'Mezclado'go 
+insert into Etapas(ID,Descripcion)
+select 4,'Compresion'go
+insert into Etapas(ID,Descripcion)
+select 5,'Recubrimiento'go
+insert into Etapas(ID,Descripcion)
+select 6,'Blisteado'go 
+insert into Etapas(ID,Descripcion)
+select 7,'Estuchado'go
+
+
+insert into ProductosXEtapas(IdProducto,IdEtapa,IdEstado)
+select 1,1,1 go 
+
+select * from Estados
+
+insert into Estados(ID,Descripcion)
+select 1,'Cuarentena'go
+insert into Estados(ID,Descripcion)
+select 2,'Aprobado'go
+insert into Estados(ID,Descripcion)
+select 3,'Rechazado'go
